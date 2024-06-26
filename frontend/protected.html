@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Protected Page</h1>
+        <div class="card">
+            <img id="avatar" src="" alt="Avatar">
+            <p id="greeting"></p>
+        </div>
+        <p id="message"></p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', getProtected);
+
+        async function getProtected() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('http://localhost:3000/auth/protected', {
+                    method: 'GET',
+                    headers: {
+                        'x-access-token': token,
+                    },
+                });
+                const data = await response.text();
+                if (response.ok) {
+                    document.getElementById('greeting').textContent = data;
+                    const randomString = Math.random().toString(36).substring(7);
+                    const avatarURL = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${randomString}`;
+                    document.getElementById('avatar').src = avatarURL;
+                } else {
+                    document.getElementById('message').textContent = `Access denied: ${data}`;
+                }
+            } catch (error) {
+                document.getElementById('message').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
